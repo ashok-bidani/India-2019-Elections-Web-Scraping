@@ -39,16 +39,15 @@ initial_raw_html = retrieve_html('http://results.eci.gov.in/pc/en/constituencywi
 # Use Beautiful Soup to narrow down text to the state codes from the initial HTML document, which is basically one large table
 # Use the "lxml" parser
 initial_html = BeautifulSoup(initial_raw_html, "lxml")
-bigtable = initial_html.find('table', class_='tabc')
-bigrow = bigtable.findAll('tr')[10]
+
 # State codes are included under "options" tags
-state_options = bigrow.td.findAll('option')[1:]
+state_options = initial_html.find('table', class_='tabc').findAll('tr')[10].td.findAll('option')[1:]
 
 # Create a list to hold the state codes/abbreviations
 state_abbreviations_list = []
 
 # The last "option" tag refers to something else from the states, so we exclude that one and take all the other option values. Then we sort the list.
-for option in state_options[:(len(state_options)-1)]:
+for option in state_options[:36]:
     state_abbreviations_list.append(option['value'])
 state_abbreviations_list.sort()
 print(state_abbreviations_list)
