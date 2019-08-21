@@ -27,6 +27,9 @@ constituency_value_holder = []
 # Field to hold number of constituencies in each state (not end data)
 constituencies_in_state_list = []
 
+# Temporary field to store constituency count
+constituency_number = 0
+
 # Temporary fields to store data about candidates, parties, EVM votes, postal votes, total votes, and vote percentage in each constituency (not end data). 
 constituency_candidates_holder = []
 constituency_parties_holder = []
@@ -96,7 +99,7 @@ for i in range(len(state_abbreviations_list)):
 
         # Insert data into temporary fields for each row of the ECI table for that particular constituency. Each row responds to one candidate for office in that constituency. Also, format data as string/int/float and edit data in final 'Total' row to better represent desired information
         #Jammu and Kashmir table has an extra column - "Migrant Votes" - which means the web scraper has to act differently in that case
-        if state[i] is not 'Jammu & Kashmir':
+        if (state[constituency_number] != 'Jammu & Kashmir'):
             
             for row in usable_data:
                 candidate_data = []
@@ -180,6 +183,9 @@ for i in range(len(state_abbreviations_list)):
             constituency_vote_percentages_holder = []
 
             sleep(1)
+            
+        # Add one to constituency counter
+        constituency_number += 1
         
 # Exit the browser
 driver.quit()
