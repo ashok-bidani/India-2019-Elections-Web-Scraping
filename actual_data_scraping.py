@@ -35,6 +35,17 @@ constituency_postal_votes_holder = []
 constituency_total_votes_holder = []
 constituency_vote_percentages_holder = []
 
+# End and temporary fields specific to Jammu & Kashmir, which has an additional field, "Migrant Votes"
+jk_constituency = []
+jk_candidates = []
+jk_parties = []
+jk_evm_votes = []
+jk_migrant_votes = []
+jk_postal_votes = []
+jk_total_votes = []
+jk_vote_percentages = []
+constituency_migrant_votes_holder = []
+
 # PART 1: GET ECI STATE CODES/ABBREVIATIONS
 # Use selenium to open starting URL
 start_url = 'http://results.eci.gov.in/pc/en/constituencywise/ConstituencywiseU011.htm?ac=1'
@@ -64,8 +75,7 @@ print(constituencies_in_state_list)
 
 # PART 3: WEB SCRAPER
 # Obtain data for each constituency by looping through all of the states and all of the constituencies in each state
-#for i in range(len(state_abbreviations_list)):
-for i in range(1,2):
+for i in range(len(state_abbreviations_list)):
     for j in range(1, (constituencies_in_state_list[i]+1)):
         
         # Navigate to the particular URL        
@@ -78,63 +88,125 @@ for i in range(1,2):
         constituency_info = text.th.string
         tabular_data = text.findAll('tr')
         usable_data = tabular_data[6:(len(tabular_data)-1)]
+        
+        # Insert data from temporary fields into end result fields. For state and constituency fields, one value is inserted for each constituency. Need to do this before the next step because the data for the Jammu & Kashmir state is formatted differently.
+        constituency_info_list = constituency_info.replace('\n', '').strip().split('-', 1)
+        state.append(constituency_info_list[0].title())
+        constituency.append(constituency_info_list[1].title())
 
         # Insert data into temporary fields for each row of the ECI table for that particular constituency. Each row responds to one candidate for office in that constituency. Also, format data as string/int/float and edit data in final 'Total' row to better represent desired information
-        for row in usable_data:
-            candidate_data = []
-            candidate_info = row.findAll('td')
-            for data_entry in candidate_info:
-                candidate_data.append(data_entry.string)
-            print(candidate_data)
-            constituency_evm_votes_holder.append(int(candidate_data[3]))
-            constituency_postal_votes_holder.append(int(candidate_data[4]))
-            constituency_total_votes_holder.append(int(candidate_data[5]))  
-            if candidate_data[6] is None:
-                constituency_candidates_holder.append('TOTAL')
-                constituency_parties_holder.append('TOTAL')
-                constituency_vote_percentages_holder.append(100.0)
-            else:
-                constituency_candidates_holder.append(candidate_data[1].title())
-                constituency_parties_holder.append(candidate_data[2])
-                constituency_vote_percentages_holder.append(float(candidate_data[6]))
-            print(candidate_data[0])
+        #Jammu and Kashmir table has an extra column - "Migrant Votes" - which means the web scraper has to act differently in that case
+        if state[i] is not 'Jammu & Kashmir':
+            
+            for row in usable_data:
+                candidate_data = []
+                candidate_info = row.findAll('td')
+                for data_entry in candidate_info:
+                    candidate_data.append(data_entry.string)
+                constituency_evm_votes_holder.append(int(candidate_data[3]))
+                constituency_postal_votes_holder.append(int(candidate_data[4]))
+                constituency_total_votes_holder.append(int(candidate_data[5]))  
+                if candidate_data[6] is None:
+                    constituency_candidates_holder.append('TOTAL')
+                    constituency_parties_holder.append('TOTAL')
+                    constituency_vote_percentages_holder.append(100.0)
+                else:
+                    constituency_candidates_holder.append(candidate_data[1].title())
+                    constituency_parties_holder.append(candidate_data[2].title())
+                    constituency_vote_percentages_holder.append(float(candidate_data[6]))
+        
+            # Insert data from temporary fields into end result fields. In the other fields from state and constituency (candidates, parties, evm_votes, etc.), a list of values is inserted which represents the information for each candidate running for office.
+            candidates.append(constituency_candidates_holder)
+            parties.append(constituency_parties_holder)
+            evm_votes.append(constituency_evm_votes_holder)
+            postal_votes.append(constituency_postal_votes_holder)
+            total_votes.append(constituency_total_votes_holder)
+            vote_percentages.append(constituency_vote_percentages_holder)
 
-#        # Replace data in stored temporary fields to better represent the 'Total' row
-#        constituency_candidates_holder = ['TOTAL' if v is 'Total' else v for v in constituency_vote_percentages_holder]
-#        constituency_vote_percentages_holder = ['ALL' if v is '\xa0' else v for v in constituency_vote_percentages_holder]
-#        constituency_vote_percentages_holder = [100.0 if v is None else v for v in constituency_vote_percentages_holder]
+            # Reset temporary fields
+            constituency_candidates_holder = []
+            constituency_parties_holder = []
+            constituency_evm_votes_holder = []
+            constituency_postal_votes_holder = []
+            constituency_total_votes_holder = []
+            constituency_vote_percentages_holder = []
 
-        # Insert data from temporary fields into end result fields. For state and constituency fields, one value is inserted for each constituency; in the other fields (candidates, parties, evm_votes, etc.), a list of values is inserted which represents the information for each candidate running for office.
-        constituency_info_list = constituency_info.replace('\n', '').strip().split('-', 1)
-        state.append(constituency_info_list[0])
-        constituency.append(constituency_info_list[1])
-        candidates.append(constituency_candidates_holder)
-        parties.append(constituency_parties_holder)
-        evm_votes.append(constituency_evm_votes_holder)
-        postal_votes.append(constituency_postal_votes_holder)
-        total_votes.append(constituency_total_votes_holder)
-        vote_percentages.append(constituency_vote_percentages_holder)
+            # Rest one second to approximate human web use
+            sleep(1)
 
-        # Reset temporary fields
-        constituency_candidates_holder = []
-        constituency_parties_holder = []
-        constituency_evm_votes_holder = []
-        constituency_postal_votes_holder = []
-        constituency_total_votes_holder = []
-        constituency_vote_percentages_holder = []
+        # Now handle the Jammu & Kashmir case. I will create a separate Pandas dataframe for Kashmir (so am using special fields to capture the data) as well as incorporate the data from Jammu & Kashmir that fits under existing fields into the larger dataframe
+        else:
+            
+            for row in usable_data:
+                candidate_data = []
+                candidate_info = row.findAll('td')
+                for data_entry in candidate_info:
+                    candidate_data.append(data_entry.string)
+                constituency_evm_votes_holder.append(int(candidate_data[3]))
+                constituency_migrant_votes_holder.append(int(candidate_data[4]))
+                constituency_postal_votes_holder.append(int(candidate_data[5]))
+                constituency_total_votes_holder.append(int(candidate_data[6]))  
+                if candidate_data[7] is None:
+                    constituency_candidates_holder.append('TOTAL')
+                    constituency_parties_holder.append('TOTAL')
+                    constituency_vote_percentages_holder.append(100.0)
+                else:
+                    constituency_candidates_holder.append(candidate_data[1].title())
+                    constituency_parties_holder.append(candidate_data[2].title())
+                    constituency_vote_percentages_holder.append(float(candidate_data[7]))
+            
+            jk_constituency.append(constituency_info_list[1].title())
+            jk_candidates.append(constituency_candidates_holder)
+            jk_parties.append(constituency_parties_holder)
+            jk_evm_votes.append(constituency_evm_votes_holder)
+            jk_migrant_votes.append(constituency_migrant_votes_holder)
+            jk_postal_votes.append(constituency_postal_votes_holder)
+            jk_total_votes.append(constituency_total_votes_holder)
+            jk_vote_percentages.append(constituency_vote_percentages_holder)
+            
+            candidates.append(constituency_candidates_holder)
+            parties.append(constituency_parties_holder)
+            evm_votes.append(constituency_evm_votes_holder)
+            postal_votes.append(constituency_postal_votes_holder)
+            total_votes.append(constituency_total_votes_holder)
+            vote_percentages.append(constituency_vote_percentages_holder)
 
-        # Rest one second to approximate human web use
-        sleep(1)
+            constituency_candidates_holder = []
+            constituency_parties_holder = []
+            constituency_evm_votes_holder = []
+            constituency_migrant_votes_holder = []
+            constituency_postal_votes_holder = []
+            constituency_total_votes_holder = []
+            constituency_vote_percentages_holder = []
+
+            sleep(1)
         
 # Exit the browser
 driver.quit()
 
 # PART 4: PRINT RESULTS
 print(state)
+print('--------------------- \n \n \n')
 print(constituency)
+print('--------------------- \n \n \n')
 print(candidates)
+print('--------------------- \n \n \n')
 print(parties)
+print('--------------------- \n \n \n')
 print(evm_votes)
+print('--------------------- \n \n \n')
 print(postal_votes)
+print('--------------------- \n \n \n')
 print(total_votes)
+print('--------------------- \n \n \n')
 print(vote_percentages)
+print('--------------------- \n \n \n')
+print('Jammu & Kashmir')
+print(jk_constituency)
+print(jk_candidates)
+print(jk_parties)
+print(jk_evm_votes)
+print(jk_migrant_votes)
+print(jk_postal_votes)
+print(jk_total_votes)
+print(jk_vote_percentages)
