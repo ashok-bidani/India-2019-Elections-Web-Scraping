@@ -8,7 +8,7 @@ import pandas as pd
 import os
 
 # PART 0: SET UP
-# Fields to hold scraped data
+# End fields to hold scraped data
 state = []
 constituency = []
 candidates = []
@@ -27,7 +27,7 @@ constituency_value_holder = []
 # Field to hold number of constituencies in each state (not end data)
 constituencies_in_state_list = []
 
-# Temporary field to store constituency count
+# Temporary field to store constituency count (not end data)
 constituency_number = 0
 
 # Temporary fields to store data about candidates, parties, EVM votes, postal votes, total votes, and vote percentage in each constituency (not end data). 
