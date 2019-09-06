@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from time import sleep
+from pathlib import Path
 import pandas as pd
-import os
 import csv
 
 # PART 0: SET UP
@@ -193,15 +193,17 @@ driver.quit()
 
 # PART 4: WRITE RESULTS TO CSV
 
+data_folder = Path('output_data')
+
 # Create general file with all constituency data
-with open('election_data.csv', 'w', newline='') as general_file:
+with open(data_folder/'election_data.csv', 'w', newline='') as general_file:
     writer = csv.writer(general_file)
     writer.writerow(['state', 'constituency', 'candidates', 'parties', 'evm_votes', 'postal_votes', 'total_votes', 'vote_percentages'])
     for i in range(len(state)):
         writer.writerow([state[i], constituency[i], candidates[i], parties[i], evm_votes[i], postal_votes[i], vote_percentages[i]])
 
 # J&K specific file with data for province of Jammu & Kashmir, which has the extra Migrant Votes field
-with open('jk_data.csv', 'w', newline='') as jk_file:
+with open(data_folder/'jk_data.csv', 'w', newline='') as jk_file:
     writer = csv.writer(jk_file)
     writer.writerow(['jk_constituency', 'jk_candidates', 'jk_parties', 'jk_evm_votes', 'jk_migrant_votes', 'jk_postal_votes', 'jk_total_votes', 'jk_vote_percentages'])
     for i in range(len(jk_constituency)):
