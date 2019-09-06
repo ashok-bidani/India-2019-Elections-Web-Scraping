@@ -6,6 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 import pandas as pd
 import os
+import csv
 
 # PART 0: SET UP
 # End fields to hold scraped data
@@ -190,23 +191,16 @@ for i in range(len(state_abbreviations_list)):
 # Exit the browser
 driver.quit()
 
-# PART 4: PRINT RESULTS
-print(state)
-print('--------------------- \n \n \n')
-print(constituency)
-print('--------------------- \n \n \n')
-print(candidates)
-print('--------------------- \n \n \n')
-print(parties)
-print('--------------------- \n \n \n')
-print(evm_votes)
-print('--------------------- \n \n \n')
-print(postal_votes)
-print('--------------------- \n \n \n')
-print(total_votes)
-print('--------------------- \n \n \n')
-print(vote_percentages)
-print('--------------------- \n \n \n')
+# PART 4: WRITE RESULTS TO CSV
+
+# Create general file with all constituency data
+with open('election_data.csv', 'w', newline='') as general_file:
+    writer = csv.writer(general_file)
+    writer.writerow(['state', 'constituency', 'candidates', 'parties', 'evm_votes', 'postal_votes', 'total_votes', 'vote_percentages'])
+    for i in range(len(state)):
+        writer.writerow([state[i], constituency[i], candidates[i], parties[i], evm_votes[i], postal_votes[i], vote_percentages[i]])
+
+# J&K specific file with data for province of Jammu & Kashmir
 print('Jammu & Kashmir')
 print(jk_constituency)
 print(jk_candidates)
