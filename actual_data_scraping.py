@@ -200,13 +200,9 @@ with open('election_data.csv', 'w', newline='') as general_file:
     for i in range(len(state)):
         writer.writerow([state[i], constituency[i], candidates[i], parties[i], evm_votes[i], postal_votes[i], vote_percentages[i]])
 
-# J&K specific file with data for province of Jammu & Kashmir
-print('Jammu & Kashmir')
-print(jk_constituency)
-print(jk_candidates)
-print(jk_parties)
-print(jk_evm_votes)
-print(jk_migrant_votes)
-print(jk_postal_votes)
-print(jk_total_votes)
-print(jk_vote_percentages)
+# J&K specific file with data for province of Jammu & Kashmir, which has the extra Migrant Votes field
+with open('jk_data.csv', 'w', newline='') as jk_file:
+    writer = csv.writer(jk_file)
+    writer.writerow(['jk_constituency', 'jk_candidates', 'jk_parties', 'jk_evm_votes', 'jk_migrant_votes', 'jk_postal_votes', 'jk_total_votes', 'jk_vote_percentages'])
+    for i in range(len(jk_constituency)):
+        writer.writerow([jk_constituency[i], jk_candidates[i], jk_parties[i], jk_evm_votes[i], jk_migrant_votes[i], jk_total_votes[i], jk_vote_percentages[i]])
