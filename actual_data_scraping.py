@@ -200,11 +200,46 @@ with open(data_folder/'election_data.csv', 'w', newline='') as general_file:
     writer = csv.writer(general_file)
     writer.writerow(['state', 'constituency', 'candidates', 'parties', 'evm_votes', 'postal_votes', 'total_votes', 'vote_percentages'])
     for i in range(len(state)):
-        writer.writerow([state[i], constituency[i], candidates[i], parties[i], evm_votes[i], postal_votes[i], vote_percentages[i]])
+        writer.writerow([state[i], constituency[i], candidates[i], parties[i], evm_votes[i], postal_votes[i], total_votes[i], vote_percentages[i]])
 
 # J&K specific file with data for province of Jammu & Kashmir, which has the extra Migrant Votes field
 with open(data_folder/'jk_data.csv', 'w', newline='') as jk_file:
     writer = csv.writer(jk_file)
     writer.writerow(['jk_constituency', 'jk_candidates', 'jk_parties', 'jk_evm_votes', 'jk_migrant_votes', 'jk_postal_votes', 'jk_total_votes', 'jk_vote_percentages'])
     for i in range(len(jk_constituency)):
-        writer.writerow([jk_constituency[i], jk_candidates[i], jk_parties[i], jk_evm_votes[i], jk_migrant_votes[i], jk_total_votes[i], jk_vote_percentages[i]])
+        writer.writerow([jk_constituency[i], jk_candidates[i], jk_parties[i], jk_evm_votes[i], jk_migrant_votes[i], jk_postal_votes[i], jk_total_votes[i], jk_vote_percentages[i]])
+        
+# Now we will create another file with only the information about the winning candidate in each constituency (rather than about all of the candidates).
+# Create fields to store desired information
+winning_candidate = []
+winning_party = []
+winning_evm_votes = []
+winning_postal_votes = []
+winning_total_votes = []
+winning_vote_percentage = []
+
+# Save details for the winning candidate in each constituency based on the position of the candidate who got the most votes
+for j in range(len(state)):
+    max_votes = 0
+    for k in range(len(candidates[j])):
+        if total_votes[j][k] > max_votes:
+            max_votes = total_votes[j][k]
+            candidate_number = k
+        else:
+            pass
+    print(candidate_number)
+    winning_candidate.append(candidates[j][candidate_number])
+    winning_party.append(parties[j][candidate_number])
+    winning_evm_votes.append(evm_votes[j][candidate_number])
+    winning_postal_votes.append(postal_votes[j][candidate_number])
+    winning_total_votes.append(total_votes[j][candidate_number])
+    winning_vote_percentage.append(vote_percentages[j][candidate_number])
+    print(j)
+
+# # Winning candidate data file
+# with open(data_folder/'winning_candidate_data.csv', 'w', newline='') as general_file:
+#     writer = csv.writer(general_file)
+#     writer.writerow(['state', 'constituency', 'winning candidate', 'winning party', 'winning evm votes', 'winning postal votes', 'winning total votes', 'winning vote percentage'])
+#     for i in range(len(state)):
+#         writer.writerow([state[i], constituency[i], winning_candidate[i], winning_party[i], winning_evm_votes[i], winning_postal_votes[i], winning_total_votes[i], winning_vote_percentage[i]])
+    
